@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject private var viewModel = AuthViewModel()
+    @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
         ZStack {
@@ -40,12 +40,12 @@ struct LoginView: View {
                     
                     // Main
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Email")
+                        Text("email")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        TextField("Use your Mind email", text: $viewModel.username)
+                        TextField("use_mind_email", text: $viewModel.username)
                             .padding(1)
                             .background(Color.white)
                             .cornerRadius(8)
@@ -53,27 +53,26 @@ struct LoginView: View {
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.leading)
                         
-                        Text("Password")
+                        Text("password")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        SecureField("Type your password", text: $viewModel.password)
+                        SecureField("type_password", text: $viewModel.password)
                             .padding(1)
                             .background(Color.white)
                             .cornerRadius(8)
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.leading)
                         
-                        Text("Forgot your password?")
+                        Text("forgot_password")
                             .foregroundColor(Color("secondaryColor"))
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .onTapGesture {
-                                // Acción para recuperar contraseña
+                                // ToDo
                             }
                         
-                        // Botón Log in centrado
                         Button(action: {
                             viewModel.login()
                         }) {
@@ -107,8 +106,6 @@ struct LoginView: View {
                             .foregroundColor(Color("secondaryColor"))
                             .font(.caption)
                     }
-                    
-                    
                     
                     HStack {
                         Image("arkus")

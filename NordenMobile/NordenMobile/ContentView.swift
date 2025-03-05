@@ -13,7 +13,16 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             if authViewModel.isAuthenticated {
-                HomeView()
+                if let role = authViewModel.role{
+                    switch role{
+                    case "Collaborator":
+                        MyVacationsView()
+                    case "TeamLead":
+                        AdminVacations()
+                    default:
+                        Text("Role not recognized")
+                    }
+                }
             } else {
                 LoginView()
             }

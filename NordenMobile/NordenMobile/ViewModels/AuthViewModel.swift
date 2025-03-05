@@ -18,6 +18,11 @@ class AuthViewModel: ObservableObject {
         }
     }
     @Published var errorMessage: String?
+    @Published var role: String? {
+        didSet{
+            UserDefaults.standard.set(role, forKey: "userRole")
+        }
+    }
     
     private let authService: AuthService
     private var cancellables = Set<AnyCancellable>()
@@ -25,6 +30,7 @@ class AuthViewModel: ObservableObject {
     init(authService: AuthService = AuthService()) {
         self.authService = authService
         self.isAuthenticated = UserDefaults.standard.bool(forKey: "isAuthenticated")
+        self.role = UserDefaults.standard.string(forKey: "userRole")
     }
     
     func login() {
@@ -32,6 +38,7 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
         
         authService.login(username: username, password: password)
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 self.isLoading = false
                 if case let .failure(error) = completion {
@@ -39,6 +46,7 @@ class AuthViewModel: ObservableObject {
                 }
             }, receiveValue: { user in
                 self.isAuthenticated = true
+                self.role = user.role
             })
             .store(in: &cancellables)
     }
@@ -47,5 +55,7 @@ class AuthViewModel: ObservableObject {
         isAuthenticated = false
         username = ""
         password = ""
+        role = nil
+        //UserDefaults.standard.removeObject(forKey: "userRole")
     }
 }
