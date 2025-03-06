@@ -23,6 +23,11 @@ class AuthViewModel: ObservableObject {
             UserDefaults.standard.set(role, forKey: "userRole")
         }
     }
+    @Published var token: String? {
+        didSet{
+            UserDefaults.standard.set(token, forKey: "token")
+        }
+    }
     
     private let authService: AuthService
     private var cancellables = Set<AnyCancellable>()
@@ -31,6 +36,7 @@ class AuthViewModel: ObservableObject {
         self.authService = authService
         self.isAuthenticated = UserDefaults.standard.bool(forKey: "isAuthenticated")
         self.role = UserDefaults.standard.string(forKey: "userRole")
+        self.token = UserDefaults.standard.string(forKey: "token")
     }
     
     func login() {
@@ -47,6 +53,7 @@ class AuthViewModel: ObservableObject {
             }, receiveValue: { user in
                 self.isAuthenticated = true
                 self.role = user.role
+                self.token = user.token
             })
             .store(in: &cancellables)
     }
@@ -56,6 +63,7 @@ class AuthViewModel: ObservableObject {
         username = ""
         password = ""
         role = nil
+        token = nil
         //UserDefaults.standard.removeObject(forKey: "userRole")
     }
 }

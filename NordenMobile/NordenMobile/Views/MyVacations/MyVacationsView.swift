@@ -1,59 +1,90 @@
-//
-//  MyVacationsView.swift
-//  NordenMobile
-//
-//  Created by Roy Quesada on 4/3/25.
-//
-
-
 import SwiftUI
 
 struct MyVacationsView: View {
-    @State private var showVacationRequest = false // Controla la pantalla de solicitud
-    @State private var selectedDate = Date() // Fecha seleccionada en el calendario
-    
+    @StateObject private var viewModel = VacationsViewModel()
+    @State private var showVacationRequests = false
+    @State private var showRequestList: Bool = false
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 
                 // 🔹 Header
-                VStack {
-                    Text("Vacations")
-                        .font(.largeTitle)
-                        .bold()
-                    
-                    Text("Account: Mind Group")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    Text("John Doe")
-                        .font(.headline)
+                if let profile = viewModel.collaboratorProfile,
+                   let accountName = viewModel.accountName
+                {
+                    VStack {
+                        Text("Vacations")
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(Color("primaryColor"))
+                        
+                        // 🔹 Account
+                        HStack {
+                            Text("Account: ")
+                                .font(.headline)
+                            Text(accountName)
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        // 🔹 Name
+                        HStack {
+                            Text("Name: ")
+                                .font(.headline)
+                            Text(profile.fullName)
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                        }
+                        //Add button if user have vacation request
+                        if !viewModel.vacationRequests.isEmpty {
+                            Button(action: { showRequestList.toggle() }) {
+                                HStack {
+                                    Text("My Vacation Requests")
+                                        .font(.headline)
+                                        .foregroundColor(Color("primaryColor"))
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(Color("primaryColor"))
+                                }
+                                .padding(.horizontal)
+                            }
+                            .padding(.horizontal)
+                        }
+                        
+                    }
+                } else if viewModel.isLoading {
+                    ProgressView("Loading...")
+                } else if let error = viewModel.errorMessage {
+                    Text("Error: \(error)")
+                        .foregroundColor(.red)
                 }
                 
-                Button(action: {
-                    showVacationRequest.toggle()
-                }) {
-                    Text("Request Vacation")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        .bold()
-                }
-                .padding(.horizontal)
+                CalendarView(
+                    selectedDate: $viewModel.selectedDate,
+                    approvedVacations: viewModel.approvedVacations,
+                    onYearChange: viewModel.updateYear,
+                    onRequestVacation: { showVacationRequests.toggle()}
+                )
                 
-                // 🔹 Lista de Requests de Vacaciones
-                //VacationRequestsView()
+                VacationListView(vacations: viewModel.approvedVacations, selectedDate: viewModel.selectedDate)
                 
-                // 🔹 Calendario
-                CalendarView()
                 
                 Spacer()
             }
             .padding()
-            .navigationDestination(isPresented: $showVacationRequest) {
-                VacationRequestView()
+            .navigationDestination(isPresented: $showVacationRequests){
+                if let teamId = viewModel.teamId{
+                    VacationRequestView(teamId: teamId)
+                }else{
+                    Text("Error: Team Id not found")
+                }
+                
+            }
+            .navigationDestination(isPresented: $showRequestList){
+                RequestsListView(vacationRequests: viewModel.vacationRequests)
+            }
+            .onAppear {
+                viewModel.loadData()
             }
         }
     }

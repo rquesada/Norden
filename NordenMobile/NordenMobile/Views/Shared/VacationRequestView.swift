@@ -8,46 +8,78 @@
 import SwiftUI
 
 struct VacationRequestView: View {
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var errorMessage: String?
-    
+    @StateObject private var viewModel: VacationRequestViewModel
+
+    init(teamId: String) {
+        _viewModel = StateObject(wrappedValue: VacationRequestViewModel(teamId: teamId))
+    }
+
     var body: some View {
         VStack(spacing: 16) {
+            
             Text("Request Vacation")
-                .font(.title)
+                .font(.largeTitle)
                 .bold()
-            
-            // 🔹 Date Picker Start Date
-            VStack(alignment: .leading) {
-                Text("Start Date")
-                    .font(.subheadline)
-                    .bold()
-                DatePicker("Select start date", selection: $startDate, displayedComponents: [.date])
-                    .datePickerStyle(.compact)
+                .foregroundColor(Color("primaryColor"))
+
+            // 🔹 Selección de fechas
+            VStack {
+                DatePicker("Start Date", selection: Binding(
+                    get: { viewModel.startDate.toDate() ?? Date() },
+                    set: { newDate in
+                        viewModel.startDate = newDate.toString()
+                        viewModel.checkForVacationConflicts() // 🔹 Llamar al endpoint cuando cambia la fecha
+                    }),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(CompactDatePickerStyle())
+                .padding(.horizontal)
+
+                DatePicker("End Date", selection: Binding(
+                    get: { viewModel.endDate.toDate() ?? Date() },
+                    set: { newDate in
+                        viewModel.endDate = newDate.toString()
+                        viewModel.checkForVacationConflicts() // 🔹 Llamar al endpoint cuando cambia la fecha
+                    }),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(CompactDatePickerStyle())
+                .padding(.horizontal)
             }
             
-            // 🔹 Date Picker End Date
-            VStack(alignment: .leading) {
-                Text("End Date")
-                    .font(.subheadline)
-                    .bold()
-                DatePicker("Select end date", selection: $endDate, displayedComponents: [.date])
-                    .datePickerStyle(.compact)
+            // 🔹 Mostrar mensajes de advertencia si existen
+            if !viewModel.pendingMessages.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.pendingMessages, id: \.self) { message in
+                        Text("⚠️ \(message)")
+                            .font(.footnote)
+                            .foregroundColor(.orange)
+                            .padding()
+                            .background(Color.yellow.opacity(0.2))
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal)
             }
-            
-            // 🔹 Error Message
-            if let error = errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
+
+            // 🔹 Mostrar mensajes de conflicto si existen
+            if !viewModel.conflictMessages.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.conflictMessages, id: \.self) { message in
+                        Text("⚠️ \(message)")
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .padding()
+                            .background(Color.red.opacity(0.2))
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal)
             }
-            
-            // 🔹 Submit Button
+
+            // 🔹 Botón de enviar solicitud
             Button(action: {
-                submitRequest()
+                print("Submitting vacation request...")
             }) {
                 Text("Submit Request")
                     .frame(maxWidth: .infinity)
@@ -57,21 +89,14 @@ struct VacationRequestView: View {
                     .cornerRadius(8)
                     .bold()
             }
+            .padding(.horizontal)
+
+            Spacer()
         }
         .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 2)
-        .padding()
     }
-    
-    // Simulación de validación
-    private func submitRequest() {
-        if endDate < startDate {
-            errorMessage = "End date cannot be before start date."
-        } else {
-            errorMessage = nil
-            // Aquí se haría la llamada a la API para enviar la solicitud
-        }
-    }
+}
+
+#Preview {
+    VacationRequestView(teamId: "3ab681a9-e3b3-43dd-83c0-4194076ee38d")
 }

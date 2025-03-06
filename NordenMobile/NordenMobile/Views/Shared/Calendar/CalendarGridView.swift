@@ -15,7 +15,6 @@ struct CalendarGridView: View {
 
     var body: some View {
         VStack {
-            // 🔹 Encabezado con los días de la semana
             HStack {
                 ForEach(daysOfWeek, id: \.self) { day in
                     Text(day)
@@ -24,7 +23,6 @@ struct CalendarGridView: View {
                 }
             }
 
-            // 🔹 Generar las celdas del calendario
             let days = generateCalendarDays()
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
                 ForEach(days, id: \.self) { day in
@@ -40,7 +38,6 @@ struct CalendarGridView: View {
         }
     }
 
-    // 🔹 Genera la lista de días para el mes actual
     private func generateCalendarDays() -> [Date] {
         var days: [Date] = []
         let calendar = Calendar.current
@@ -48,12 +45,10 @@ struct CalendarGridView: View {
         let firstWeekday = calendar.component(.weekday, from: firstOfMonth) - 1
         let numDays = calendar.range(of: .day, in: .month, for: firstOfMonth)!.count
 
-        // Agrega días vacíos al inicio del mes
         for _ in 0..<firstWeekday {
             days.append(Date.distantPast)
         }
 
-        // Agrega los días del mes
         for day in 1...numDays {
             if let date = calendar.date(byAdding: .day, value: day - 1, to: firstOfMonth) {
                 days.append(date)
@@ -62,7 +57,6 @@ struct CalendarGridView: View {
         return days
     }
 
-    // 🔹 Formatea los días (oculta los placeholders)
     private func dayText(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "d"

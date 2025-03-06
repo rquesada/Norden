@@ -18,7 +18,7 @@ class AuthService {
         return Future { promise in
             DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                 if username == "test" && password == "password" {
-                    let user = User(id: UUID().uuidString, name: "John Doe", role: "Collaborator")
+                    let user = User(id: UUID().uuidString, name: "John Doe", role: "Collaborator", token: self.collaboratorToken)
                     promise(.success(user))
                 } else {
                     promise(.failure(NSError(domain: "Invalid credentials", code: 401, userInfo: nil)))

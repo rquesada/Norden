@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "%@ - %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
     "©Mind Group 2025" : {
       "localizations" : {
         "es-419" : {
@@ -11,7 +27,10 @@
         }
       }
     },
-    "Account: Mind Group" : {
+    "⚠️ %@" : {
+
+    },
+    "Account: " : {
 
     },
     "Admin Vacations" : {
@@ -44,6 +63,9 @@
         }
       }
     },
+    "Comments: %@" : {
+
+    },
     "Done" : {
 
     },
@@ -67,6 +89,12 @@
     "End Date" : {
 
     },
+    "Error: %@" : {
+
+    },
+    "Error: Team Id not found" : {
+
+    },
     "forgot_password" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -84,7 +112,7 @@
         }
       }
     },
-    "John Doe" : {
+    "Last Updated: %@" : {
 
     },
     "Loading..." : {
@@ -134,10 +162,16 @@
         }
       }
     },
+    "My Requests" : {
+
+    },
     "My Vacation Requests" : {
 
     },
-    "No requests" : {
+    "Name: " : {
+
+    },
+    "No approved vacations this month" : {
 
     },
     "password" : {
@@ -173,16 +207,13 @@
     "Role not recognized" : {
 
     },
-    "Select end date" : {
-
-    },
     "Select Month & Year" : {
 
     },
-    "Select start date" : {
+    "Start Date" : {
 
     },
-    "Start Date" : {
+    "Status: %@" : {
 
     },
     "Submit Request" : {
