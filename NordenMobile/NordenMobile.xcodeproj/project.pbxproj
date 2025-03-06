@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7649E4DE2D7A02F50042C1F7 /* AWSCognitoAuthPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 7649E4DD2D7A02F50042C1F7 /* AWSCognitoAuthPlugin */; };
+		7649E4E02D7A02F50042C1F7 /* AWSPluginsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7649E4DF2D7A02F50042C1F7 /* AWSPluginsCore */; };
+		7649E4E22D7A02F50042C1F7 /* Amplify in Frameworks */ = {isa = PBXBuildFile; productRef = 7649E4E12D7A02F50042C1F7 /* Amplify */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		7649E3F22D7650690042C1F7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +58,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7649E4E22D7A02F50042C1F7 /* Amplify in Frameworks */,
+				7649E4E02D7A02F50042C1F7 /* AWSPluginsCore in Frameworks */,
+				7649E4DE2D7A02F50042C1F7 /* AWSCognitoAuthPlugin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +121,9 @@
 			);
 			name = NordenMobile;
 			packageProductDependencies = (
+				7649E4DD2D7A02F50042C1F7 /* AWSCognitoAuthPlugin */,
+				7649E4DF2D7A02F50042C1F7 /* AWSPluginsCore */,
+				7649E4E12D7A02F50042C1F7 /* Amplify */,
 			);
 			productName = NordenMobile;
 			productReference = 7649E3E12D7650670042C1F7 /* NordenMobile.app */;
@@ -196,6 +208,9 @@
 			);
 			mainGroup = 7649E3D82D7650670042C1F7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7649E4DC2D7A02F50042C1F7 /* XCRemoteSwiftPackageReference "amplify-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7649E3E22D7650670042C1F7 /* Products */;
 			projectDirPath = "";
@@ -561,6 +576,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7649E4DC2D7A02F50042C1F7 /* XCRemoteSwiftPackageReference "amplify-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/aws-amplify/amplify-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.46.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7649E4DD2D7A02F50042C1F7 /* AWSCognitoAuthPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7649E4DC2D7A02F50042C1F7 /* XCRemoteSwiftPackageReference "amplify-ios" */;
+			productName = AWSCognitoAuthPlugin;
+		};
+		7649E4DF2D7A02F50042C1F7 /* AWSPluginsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7649E4DC2D7A02F50042C1F7 /* XCRemoteSwiftPackageReference "amplify-ios" */;
+			productName = AWSPluginsCore;
+		};
+		7649E4E12D7A02F50042C1F7 /* Amplify */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7649E4DC2D7A02F50042C1F7 /* XCRemoteSwiftPackageReference "amplify-ios" */;
+			productName = Amplify;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7649E3D92D7650670042C1F7 /* Project object */;
 }
