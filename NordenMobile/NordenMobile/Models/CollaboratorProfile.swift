@@ -10,5 +10,6 @@ import Foundation
 struct CollaboratorProfile: Codable {
     let fullName: String
     let accountId: String
+    let collaboratorId: String
 }
 

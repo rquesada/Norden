@@ -16,17 +16,18 @@ class AuthService {
 
                         // 🔹 Ensure we are getting a Cognito session
                         if let cognitoSession = session as? AuthCognitoTokensProvider {
-                            let tokensResult = await cognitoSession.getCognitoTokens()
+                            let tokensResult = cognitoSession.getCognitoTokens()
 
                             switch tokensResult {
-                            case .success(let tokens):
-                                let idToken = tokens.idToken
+                                case .success(let tokens):
+                                
+                                    let accessToken = tokens.accessToken
+                                    print("accessToken: \(accessToken)")
+                                    let user = User(id: username, name: username, role: "Collaborator", token: accessToken)
+                                    promise(.success(user))
 
-                                let user = User(id: username, name: username, role: "Collaborator", token: idToken)
-                                promise(.success(user))
-
-                            case .failure(let authError):
-                                promise(.failure(authError))
+                                case .failure(let authError):
+                                    promise(.failure(authError))
                             }
                         } else {
                             promise(.failure(NSError(domain: "Failed to retrieve tokens", code: 500, userInfo: nil)))

@@ -4,21 +4,36 @@ struct MyVacationsView: View {
     @StateObject private var viewModel = VacationsViewModel()
     @State private var showVacationRequests = false
     @State private var showRequestList: Bool = false
+    @EnvironmentObject var authViewModel: AuthViewModel // 🔹 Para manejar el logout
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 
-                // 🔹 Header
+                // 🔹 Header con Logout siempre visible
+                HStack {
+                    Text("Vacations")
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(Color("primaryColor"))
+                    
+                    Spacer()
+                    
+                    // 🔹 Logout Button
+                    Button(action: {
+                        authViewModel.logout()
+                    }) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .foregroundColor(Color.red)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 🔹 Mostrar datos del colaborador o estado de carga
                 if let profile = viewModel.collaboratorProfile,
                    let accountName = viewModel.accountName
                 {
                     VStack {
-                        Text("Vacations")
-                            .font(.largeTitle)
-                            .bold()
-                            .foregroundColor(Color("primaryColor"))
-                        
                         // 🔹 Account
                         HStack {
                             Text("Account: ")
@@ -36,7 +51,8 @@ struct MyVacationsView: View {
                                 .font(.headline)
                                 .foregroundColor(.gray)
                         }
-                        //Add button if user have vacation request
+                        
+                        // 🔹 Botón para ver solicitudes de vacaciones
                         if !viewModel.vacationRequests.isEmpty {
                             Button(action: { showRequestList.toggle() }) {
                                 HStack {
@@ -50,7 +66,6 @@ struct MyVacationsView: View {
                             }
                             .padding(.horizontal)
                         }
-                        
                     }
                 } else if viewModel.isLoading {
                     ProgressView("Loading...")
@@ -63,24 +78,25 @@ struct MyVacationsView: View {
                     selectedDate: $viewModel.selectedDate,
                     approvedVacations: viewModel.approvedVacations,
                     onYearChange: viewModel.updateYear,
-                    onRequestVacation: { showVacationRequests.toggle()}
+                    onRequestVacation: { showVacationRequests.toggle() }
                 )
                 
                 VacationListView(vacations: viewModel.approvedVacations, selectedDate: viewModel.selectedDate)
                 
-                
                 Spacer()
             }
             .padding()
-            .navigationDestination(isPresented: $showVacationRequests){
-                if let teamId = viewModel.teamId{
-                    VacationRequestView(teamId: teamId)
-                }else{
-                    Text("Error: Team Id not found")
+            .navigationDestination(isPresented: $showVacationRequests) {
+                if let teamId = viewModel.collaboratorProfile?.accountId,
+                   let collaboratorId = viewModel.collaboratorProfile?.collaboratorId {
+                    VacationRequestView(teamId: teamId,
+                                        collaboradorId: collaboratorId,
+                                        isPresented: $showVacationRequests)
+                } else {
+                    Text("Error: Team Id or collaboratorId not found")
                 }
-                
             }
-            .navigationDestination(isPresented: $showRequestList){
+            .navigationDestination(isPresented: $showRequestList) {
                 RequestsListView(vacationRequests: viewModel.vacationRequests)
             }
             .onAppear {
@@ -92,4 +108,5 @@ struct MyVacationsView: View {
 
 #Preview {
     MyVacationsView()
+        .environmentObject(AuthViewModel()) // 🔹 Agregar `AuthViewModel` para manejar logout
 }

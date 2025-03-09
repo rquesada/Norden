@@ -23,6 +23,34 @@ class AuthViewModel: ObservableObject {
 
     init(authService: AuthService = AuthService()) {
         self.authService = authService
+        checkAuthStatus()
+        
+        #if DEBUG
+        self.username = "paladin1968@mailcuk.com"
+        self.password = "Myp4ssword#"
+        #endif
+    }
+    
+    func checkAuthStatus() {
+        Task {
+            do {
+                let session = try await Amplify.Auth.fetchAuthSession()
+                
+                if session.isSignedIn {
+                    DispatchQueue.main.async {
+                        self.isAuthenticated = true
+                        self.token = KeychainHelper.shared.retrieve(key: "authToken")
+                        self.role = UserDefaults.standard.string(forKey: "userRole") // Recuperar rol almacenado
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isAuthenticated = false
+                    self.token = nil
+                    self.role = nil
+                }
+            }
+        }
     }
     
     func login() {
@@ -40,7 +68,10 @@ class AuthViewModel: ObservableObject {
                 self.isAuthenticated = true
                 self.role = user.role
                 self.token = user.token
-                UserDefaults.standard.set(self.token, forKey: "token")
+                
+                if let token = self.token {
+                    KeychainHelper.shared.save(key: "authToken", value: token)
+                }
             })
             .store(in: &cancellables)
     }
@@ -55,7 +86,8 @@ class AuthViewModel: ObservableObject {
                     self.password = ""
                     self.role = nil
                     self.token = nil
-                    UserDefaults.standard.removeObject(forKey: "token")
+                    KeychainHelper.shared.delete(key: "authToken")
+                    UserDefaults.standard.removeObject(forKey: "userRole")
                 }
             } catch {
                 DispatchQueue.main.async {

@@ -90,7 +90,7 @@ class VacationsViewModel: ObservableObject {
         }
     }
 
-    // 🔹 Cargar vacaciones aprobadas
+    // Get approved vacations
     func fetchApprovedVacations(year: Int) {
         guard let teamId = teamId else { return }
         isLoading = true
