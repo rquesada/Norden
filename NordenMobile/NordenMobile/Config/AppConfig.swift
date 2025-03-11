@@ -16,7 +16,7 @@ enum Environment: String {
 
 struct AppConfig {
     
-    static let currentEnvironment: Environment = .dev
+    static let currentEnvironment: Environment = .prod
 
     // 🔹 Definir los endpoints por entorno
     static var baseURL: String {
@@ -26,7 +26,7 @@ struct AppConfig {
         case .qa:
             return "https://qa-vacations-api.nordhen.com"
         case .prod:
-            return "https://qa-vacations-api.nordhen.com"
+            return "https://vacations-api.nordhen.com"
         }
     }
     

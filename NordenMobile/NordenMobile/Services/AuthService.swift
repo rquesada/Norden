@@ -19,11 +19,25 @@ class AuthService {
                             let tokensResult = cognitoSession.getCognitoTokens()
 
                             switch tokensResult {
+                                
                                 case .success(let tokens):
                                 
-                                    let accessToken = tokens.accessToken
-                                    print("accessToken: \(accessToken)")
-                                    let user = User(id: username, name: username, role: "Collaborator", token: accessToken)
+                                
+                                let accessToken = tokens.accessToken
+                                let idToken = tokens.idToken
+                                
+                                if let decodedPayLoad = self.decodeJWT(token: idToken){
+                                    print("decodedPayLoad: \(decodedPayLoad)")
+                                    if let userRole = decodedPayLoad["cognito:groups"]{
+                                        print("User rol: \(userRole)")
+                                    }
+                                }
+                                   
+                                   
+                               
+                                
+                                
+                                let user = User(id: username, name: username, role: "Collaborator", token: accessToken)
                                     promise(.success(user))
 
                                 case .failure(let authError):
@@ -42,5 +56,27 @@ class AuthService {
         }
         .receive(on: DispatchQueue.main)
         .eraseToAnyPublisher()
+    }
+    
+    private func decodeJWT(token: String) -> [String: Any]? {
+        let segments = token.split(separator: ".")
+        guard segments.count > 1 else { return nil }
+
+        var base64String = String(segments[1])
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+
+        while base64String.count % 4 != 0 {
+            base64String.append("=")
+        }
+
+        guard let decodedData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters),
+              let jsonObject = try? JSONSerialization.jsonObject(with: decodedData, options: []),
+              let payload = jsonObject as? [String: Any] else {
+            print("❌ Error: No se pudo decodificar el JWT")
+            return nil
+        }
+
+        return payload
     }
 }

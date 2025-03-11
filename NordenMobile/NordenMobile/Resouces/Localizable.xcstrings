@@ -210,6 +210,12 @@
     "Request Vacation" : {
 
     },
+    "Search options..." : {
+
+    },
+    "Select a Section" : {
+
+    },
     "Select Month & Year" : {
 
     },
@@ -304,6 +310,9 @@
           }
         }
       }
+    },
+    "You selected: %@" : {
+
     }
   },
   "version" : "1.0"
