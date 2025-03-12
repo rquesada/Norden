@@ -17,6 +17,9 @@
     "%lld" : {
 
     },
+    "%lld Business Days" : {
+
+    },
     "©Mind Group 2025" : {
       "localizations" : {
         "es-419" : {
@@ -111,9 +114,6 @@
           }
         }
       }
-    },
-    "Last Updated: %@" : {
-
     },
     "Loading..." : {
       "localizations" : {
@@ -210,19 +210,16 @@
     "Request Vacation" : {
 
     },
-    "Search options..." : {
+    "Requested on: %@" : {
 
     },
-    "Select a Section" : {
+    "Search options..." : {
 
     },
     "Select Month & Year" : {
 
     },
     "Start Date" : {
-
-    },
-    "Status: %@" : {
 
     },
     "Submit Request" : {
@@ -301,7 +298,11 @@
         }
       }
     },
+    "Welcome to Norden Mobile!" : {
+
+    },
     "Welcome to NordenMobile!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es-419" : {
           "stringUnit" : {

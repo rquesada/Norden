@@ -19,7 +19,3 @@ struct DetailView: View {
         .navigationTitle(option.name)
     }
 }
-
-#Preview {
-    DetailView(option: SideMenuOption(id: 1, name: "Business Intelligence", url: "/", icon: "chart.bar.fill"))
-}

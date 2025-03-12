@@ -26,19 +26,15 @@ class AuthService {
                                 let accessToken = tokens.accessToken
                                 let idToken = tokens.idToken
                                 
-                                if let decodedPayLoad = self.decodeJWT(token: idToken){
-                                    print("decodedPayLoad: \(decodedPayLoad)")
-                                    if let userRole = decodedPayLoad["cognito:groups"]{
-                                        print("User rol: \(userRole)")
-                                    }
-                                }
-                                   
-                                   
-                               
-                                
-                                
-                                let user = User(id: username, name: username, role: "Collaborator", token: accessToken)
+                                if let decodedPayload = self.decodeJWT(token: idToken),
+                                   let roleList = decodedPayload["cognito:groups"] as? [String] {
+                                    
+                                    let userRoles = roleList.compactMap { RoleName(rawValue: $0) }
+                                    print("User roles: \(userRoles)")
+                                    
+                                    let user = User(id: username, name: username, roles: userRoles, token: accessToken)
                                     promise(.success(user))
+                                }
 
                                 case .failure(let authError):
                                     promise(.failure(authError))

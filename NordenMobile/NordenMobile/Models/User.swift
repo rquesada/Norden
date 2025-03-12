@@ -10,6 +10,6 @@ import Foundation
 struct User: Identifiable {
     let id: String
     let name: String
-    let role: String
+    let roles: [RoleName]
     let token: String
 }

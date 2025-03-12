@@ -15,8 +15,9 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isAuthenticated: Bool = false
     @Published var errorMessage: String?
-    @Published var role: String?
+    @Published var roles: [RoleName]?
     @Published var token: String?
+    
 
     private let authService: AuthService
     private var cancellables = Set<AnyCancellable>()
@@ -40,14 +41,17 @@ class AuthViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.isAuthenticated = true
                         self.token = KeychainHelper.shared.retrieve(key: "authToken")
-                        self.role = UserDefaults.standard.string(forKey: "userRole") // Recuperar rol almacenado
+                        if let savedRoles = UserDefaults.standard.array(forKey: "userRoles") as? [String] {
+                            self.roles = savedRoles.compactMap { RoleName(rawValue: $0) }
+                        }
+
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
                     self.isAuthenticated = false
                     self.token = nil
-                    self.role = nil
+                    self.roles = nil
                 }
             }
         }
@@ -66,28 +70,29 @@ class AuthViewModel: ObservableObject {
                 }
             }, receiveValue: { user in
                 self.isAuthenticated = true
-                self.role = user.role
+                self.roles = user.roles
                 self.token = user.token
                 
                 if let token = self.token {
                     KeychainHelper.shared.save(key: "authToken", value: token)
+                    UserDefaults.standard.set(user.roles.map { $0.rawValue }, forKey: "userRoles")
                 }
             })
             .store(in: &cancellables)
     }
     
     func logout() {
-        Task {
+        Task { 
             do {
                 try await Amplify.Auth.signOut()
                 DispatchQueue.main.async {
                     self.isAuthenticated = false
                     self.username = ""
                     self.password = ""
-                    self.role = nil
+                    self.roles = nil
                     self.token = nil
                     KeychainHelper.shared.delete(key: "authToken")
-                    UserDefaults.standard.removeObject(forKey: "userRole")
+                    UserDefaults.standard.removeObject(forKey: "userRoles")
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -96,5 +101,6 @@ class AuthViewModel: ObservableObject {
             }
         }
     }
+
 }
 
