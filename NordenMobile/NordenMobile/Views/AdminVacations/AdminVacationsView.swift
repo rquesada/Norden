@@ -51,7 +51,14 @@ struct AdminVacationsView: View {
 
             Picker("Section", selection: $selectedTab) {
                 ForEach(AdminTab.allCases, id: \.self) { tab in
-                    Text(tab.rawValue).tag(tab)
+                    switch tab {
+                    case .approvals:
+                        Text("\(tab.rawValue) (\(viewModel.approvals.count))").tag(tab)
+                    case .notifications:
+                        Text("\(tab.rawValue) (\(viewModel.notifications.count))").tag(tab)
+                    case .calendar:
+                        Text(tab.rawValue).tag(tab)
+                    }
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
