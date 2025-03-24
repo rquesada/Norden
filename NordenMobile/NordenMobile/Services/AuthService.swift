@@ -30,8 +30,7 @@ class AuthService {
                                    let roleList = decodedPayload["cognito:groups"] as? [String] {
                                     
                                     let userRoles = roleList.compactMap { RoleName(rawValue: $0) }
-                                    print("User roles: \(userRoles)")
-                                    
+                                    print("accessToken", accessToken)
                                     let user = User(id: username, name: username, roles: userRoles, token: accessToken)
                                     promise(.success(user))
                                 }

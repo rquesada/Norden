@@ -256,3 +256,180 @@ class VacationsService {
         }.resume()
     }
 }
+
+
+//Extension used for Admins
+extension VacationsService {
+    func fetchCollaborators(for teamId: String, completion: @escaping (Result<[Collaborator], Error>) -> Void) {
+        guard let url = URL(string: "\(AppConfig.baseURL)/collaborator/collaborators/by-team?teamId=\(teamId)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 400)))
+            return
+        }
+
+        guard let token = AuthTokenManager.shared.getAuthToken() else {
+            completion(.failure(NSError(domain: "Missing Auth Token", code: 401)))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = AppConfig.requestTimeout
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data", code: 500)))
+                return
+            }
+
+            do {
+                let collaborators = try JSONDecoder().decode([Collaborator].self, from: data)
+                completion(.success(collaborators))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
+    func fetchApprovals(for teamId: String, completion: @escaping (Result<[ApprovalRequest], Error>) -> Void) {
+        let urlString = "\(AppConfig.baseURL)/notification/for-approval?teamId=\(teamId)"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 400, userInfo: nil)))
+            return
+        }
+        
+        guard let token = AuthTokenManager.shared.getAuthToken() else {
+            completion(.failure(NSError(domain: "Missing Auth Token", code: 401, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = AppConfig.requestTimeout
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No Data", code: 500, userInfo: nil)))
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion(.failure(NSError(domain: "No response", code: 500, userInfo: [NSLocalizedDescriptionKey: "No response from server"])))
+                return
+            }
+            
+            // 🔹 Si hay un error en la respuesta del servidor, intentamos extraer el mensaje
+            if httpResponse.statusCode >= 400 {
+                do {
+                    if let errorResponse = try? JSONDecoder().decode([String: String].self, from: data),
+                       let message = errorResponse["message"] {
+                        completion(.failure(NSError(domain: "Server Error", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: message])))
+                    } else {
+                        let responseString = String(data: data, encoding: .utf8) ?? "No Data"
+                        print("🔴 Error Response: \(responseString)")
+                        completion(.failure(NSError(domain: "Server Error", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Unexpected server response"])))
+                    }
+                }
+                return
+            }
+            
+            // 🔹 Imprimimos el JSON antes de intentar decodificar
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("📄 JSON Response:\n\(jsonString)")
+            } else {
+                print("❌ Could not convert JSON to String")
+            }
+            
+            do {
+                let decodedResponse = try JSONDecoder().decode([ApprovalRequest].self, from: data)
+                completion(.success(decodedResponse))
+            } catch let decodingError as DecodingError {
+                // 🔹 Desglosamos el error de decodificación para obtener más información
+                switch decodingError {
+                case .dataCorrupted(let context):
+                    print("❌ Data Corrupted Error: \(context.debugDescription)")
+                case .keyNotFound(let key, let context):
+                    print("❌ Key Not Found: \(key.stringValue) in \(context.debugDescription)")
+                case .typeMismatch(let type, let context):
+                    print("❌ Type Mismatch: \(type) in \(context.debugDescription)")
+                case .valueNotFound(let type, let context):
+                    print("❌ Value Not Found: \(type) in \(context.debugDescription)")
+                @unknown default:
+                    print("❌ Unknown Decoding Error")
+                }
+                
+                print("🛑 Full Error: \(decodingError)")
+                completion(.failure(decodingError))
+            } catch {
+                print("❌ General Decoding Error: \(error)")
+                completion(.failure(error))
+            }
+        }
+        .resume()
+    }
+
+    
+    func fetchNotifications(for teamId: String, completion: @escaping (Result<[NotificationItem], Error>) -> Void) {
+        let urlString = "\(AppConfig.baseURL)/notification/?teamId=\(teamId)&isAdmin=true"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 400, userInfo: nil)))
+            return
+        }
+
+        guard let token = AuthTokenManager.shared.getAuthToken() else {
+            completion(.failure(NSError(domain: "Missing Auth Token", code: 401, userInfo: nil)))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = AppConfig.requestTimeout
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data", code: 500, userInfo: nil)))
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion(.failure(NSError(domain: "No response", code: 500, userInfo: [NSLocalizedDescriptionKey: "No response from server"])))
+                return
+            }
+            
+            if httpResponse.statusCode == 500 {
+                do {
+                    let errorResponse = try JSONDecoder().decode([String: String].self, from: data)
+                    let message = errorResponse["message"] ?? "Internal Server Error"
+                    completion(.failure(NSError(domain: "Server Error", code: 500, userInfo: [NSLocalizedDescriptionKey: message])))
+                } catch {
+                    completion(.failure(NSError(domain: "Server Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Unexpeted server response"])))
+                }
+                return
+            }
+            
+            do {
+                let decodedResponse = try JSONDecoder().decode([NotificationItem].self, from: data)
+                completion(.success(decodedResponse))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+}
+

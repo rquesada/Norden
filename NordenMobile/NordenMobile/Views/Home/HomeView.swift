@@ -80,7 +80,7 @@ struct HomeView: View {
                 case .myVacations:
                     MyVacationsView()
                 case .adminVacations:
-                    AdminVacations()
+                    AdminVacationsView()
                 }
             }
         }

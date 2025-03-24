@@ -4,6 +4,32 @@
     "" : {
 
     },
+    "**Collaborator:** %@" : {
+
+    },
+    "**Date Range:** %@ - %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "**Date Range:** %1$@ - %2$@"
+          }
+        }
+      }
+    },
+    "**Seniority:** %@ (%lld years)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "**Seniority:** %1$@ (%2$lld years)"
+          }
+        }
+      }
+    },
+    "**Status:** %@" : {
+
+    },
     "%@ - %@" : {
       "localizations" : {
         "en" : {
@@ -33,10 +59,25 @@
     "⚠️ %@" : {
 
     },
+    "Account" : {
+
+    },
     "Account: " : {
 
     },
+    "Add your comments..." : {
+
+    },
     "Admin Vacations" : {
+
+    },
+    "AdminCalendarView" : {
+
+    },
+    "Approval Requests" : {
+
+    },
+    "Approve" : {
 
     },
     "By Mind Group" : {
@@ -66,7 +107,13 @@
         }
       }
     },
+    "Collaborator" : {
+
+    },
     "Comments: %@" : {
+
+    },
+    "Conflicts Detected:" : {
 
     },
     "Done" : {
@@ -115,6 +162,9 @@
         }
       }
     },
+    "Loading conflicts..." : {
+
+    },
     "Loading..." : {
       "localizations" : {
         "es-419" : {
@@ -162,6 +212,9 @@
         }
       }
     },
+    "Monthly Vacation Balance" : {
+
+    },
     "My Requests" : {
 
     },
@@ -172,6 +225,9 @@
 
     },
     "No approved vacations this month" : {
+
+    },
+    "No notifications available." : {
 
     },
     "OK" : {
@@ -207,6 +263,12 @@
     "Reason (Optional)" : {
 
     },
+    "Reject" : {
+
+    },
+    "Request Details" : {
+
+    },
     "Request Vacation" : {
 
     },
@@ -214,6 +276,9 @@
 
     },
     "Search options..." : {
+
+    },
+    "Section" : {
 
     },
     "Select Month & Year" : {
@@ -229,6 +294,9 @@
 
     },
     "Success" : {
+
+    },
+    "Total available days:" : {
 
     },
     "type_password" : {
@@ -312,7 +380,7 @@
         }
       }
     },
-    "You selected: %@" : {
+    "Your Comments" : {
 
     }
   },
