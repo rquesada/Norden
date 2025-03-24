@@ -84,9 +84,6 @@
     "AdminCalendarView" : {
 
     },
-    "Approval Requests" : {
-
-    },
     "Approve" : {
 
     },
@@ -238,6 +235,9 @@
 
     },
     "No notifications available." : {
+
+    },
+    "No vacation requests to review." : {
 
     },
     "OK" : {

@@ -14,6 +14,11 @@ extension String {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.date(from: self)
     }
+    
+    /// 🔹 Devuelve un string formateado "MMM dd" si la cadena es una fecha válida
+    func toMonthDayFormatted() -> String {
+        return self.toDate()?.toMonthDayString() ?? self
+    }
 }
 
 extension Date {
@@ -21,6 +26,14 @@ extension Date {
     func toString() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: self)
+    }
+    
+    /// 🔹 Devuelve la fecha en formato "MMM dd", por ejemplo: "Apr 03"
+    func toMonthDayString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX") // Asegura nombres de meses en inglés
         return formatter.string(from: self)
     }
 }

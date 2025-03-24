@@ -9,46 +9,89 @@
 import SwiftUI
 
 struct ApprovalsView: View {
-    
     let approvalRequests: [ApprovalRequest]
+    let errorMessage: String?
+    
     @State private var selectedRequest: ApprovalRequest?
     
     var body: some View {
-        NavigationView {
-            List(approvalRequests) { request in
-                Button(action: {
-                    selectedRequest = request
-                }) {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(request.subTitle)
-                                .font(.headline)
-                            Text("\(request.details.first?.startDate ?? "") - \(request.details.first?.endDate ?? "")")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
-                        if let status = request.details.first?.status {
-                            Text(status)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(status == "Pending" ? Color.yellow : Color.green)
-                                .cornerRadius(8)
-                        }
-                    }
+        VStack {
+            if let errorMessage = errorMessage{
+                VStack{
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.red)
+                        .font(.largeTitle)
+                        .padding()
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray)
                 }
+                .padding()
             }
-            .navigationTitle("Approval Requests")
-            .sheet(item: $selectedRequest) { request in
-                ApprovalDetailView(request: request)
+            else if approvalRequests.isEmpty {
+                VStack{
+                    Image(systemName: "tray.fill")
+                        .foregroundColor(.gray)
+                        .font(.largeTitle)
+                        .padding()
+                    Text("No vacation requests to review.")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                }
+                .padding()
+            }
+            else{
+                List(approvalRequests) { request in
+                    Button(action: {
+                        selectedRequest = request
+                    }) {
+                        ApprovalsItemView(request: request)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(.init(top: 5, leading: 0, bottom: 5, trailing: 0))
+                }
+                .listStyle(PlainListStyle())
             }
         }
+        .padding(.horizontal)
+        .sheet(item: $selectedRequest) { request in
+            ApprovalDetailView(request: request)
+        }
+    }
+}
+
+struct ApprovalsItemView: View{
+    
+    let request:ApprovalRequest
+    
+    var body: some View {
+        HStack {
+            //Line
+            Rectangle()
+                .fill(request.details.first?.statusColor ?? Color.gray)
+                   .frame(width: 2)
+            //Text
+            VStack(alignment: .leading) {
+                Text(request.details.first?.fullName ?? request.title)
+                    .font(.headline)
+                Text("\(request.details.first?.startDate.toMonthDayFormatted() ?? "") - \(request.details.first?.endDate.toMonthDayFormatted() ?? "")")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color("lightGrayBackground"))
+        .cornerRadius(8)
     }
 }
 
 // MARK: - Preview with Dummy Data
 #Preview {
-    ApprovalsView(approvalRequests: dummyApprovals)
+    ApprovalsView(approvalRequests: dummyApprovals, errorMessage: nil)
 }
 
 // MARK: - Dummy Data for Preview

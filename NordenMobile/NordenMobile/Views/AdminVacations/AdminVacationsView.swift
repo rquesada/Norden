@@ -68,7 +68,7 @@ struct AdminVacationsView: View {
             VStack {
                 switch selectedTab {
                 case .approvals:
-                    ApprovalsView(approvalRequests: viewModel.approvals)
+                    ApprovalsView(approvalRequests: viewModel.approvals, errorMessage: viewModel.errorMessage)
                 case .calendar:
                     AdminCalendarView()
                 case .notifications:

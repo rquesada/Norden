@@ -27,7 +27,8 @@ struct NotificationsView: View {
                         .foregroundColor(.gray)
                 }
                 .padding()
-            } else if notifications.isEmpty {
+            }
+            else if notifications.isEmpty {
                 VStack{
                     Image(systemName: "bell.slash")
                         .foregroundColor(.gray)
@@ -38,8 +39,9 @@ struct NotificationsView: View {
                         .foregroundColor(.gray)
                 }
                 .padding()
-            }else{
-                List(notifications) { notification in
+            }
+            else{
+                List(notifications) { notification    in
                     Button(action:{
                         selectedNotification = notification
                     }){
