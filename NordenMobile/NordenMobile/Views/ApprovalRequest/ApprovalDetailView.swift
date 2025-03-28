@@ -9,75 +9,188 @@ import SwiftUI
 
 struct ApprovalDetailView: View {
     let request: ApprovalRequest
+    var onSuccess: () -> Void
+    
     @StateObject private var detailViewModel = ApprovalDetailViewModel()
     @State private var comments: String = ""
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(request.title)
-                .font(.title)
-                .bold()
-            
-            if let detail = request.details.first {
-                VStack(alignment: .leading) {
-                    Text("**Collaborator:** \(detail.fullName)")
-                    Text("**Date Range:** \(detail.startDate) - \(detail.endDate)")
-                    Text("**Status:** \(detail.status)")
-                    Text("**Seniority:** \(detail.seniority) (\(detail.tenure) years)")
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("Vacation Request Details")
+                        .font(.title2)
+                        .bold()
                 }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-            }
-            
-            if detailViewModel.isLoading {
-                ProgressView("Loading conflicts...")
-            } else if !detailViewModel.conflicts.isEmpty {
-                Text("Conflicts Detected:")
-                ForEach(detailViewModel.conflicts, id: \.self) { conflict in
-                    Text("⚠️ \(conflict)")
-                        .foregroundColor(.red)
-                }
-            }
-            
-            Text("Your Comments")
-                .font(.headline)
-            
-            TextField("Add your comments...", text: $comments)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.bottom)
-            
-            HStack {
-                Button(action: {
-                    print("Request Rejected")
-                }) {
-                    Text("Reject")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+
+                Text("Review the request and check for any conflicts")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
                 
-                Button(action: {
-                    print("Request Approved")
-                }) {
-                    Text("Approve")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                Divider()
+
+                // Collaborator
+                HStack(alignment: .top, spacing: 12) {
+                    Circle()
+                        .fill(Color("personlightBlue"))
+                        .frame(width: 50, height: 50)
+                        .overlay(Image(systemName: "person.fill").foregroundColor(.blue))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(request.details.first?.fullName ?? "")
+                            .font(.headline)
+                        Text("Requested on \(request.details.first?.createdAt.toDisplayDate() ?? "-")")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        HStack(spacing: 16) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star")
+                                    .foregroundColor(.orange)
+                                Text(request.details.first?.seniority ?? "")
+                                    .foregroundColor(Color("secondaryColor"))
+                            }
+
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                    .foregroundColor(.orange)
+                                Text("\(request.details.first?.tenure ?? 0) years")
+                                    .foregroundColor(Color("secondaryColor"))
+                            }
+                        }
+
+                        .font(.footnote)
+                    }
+                }
+
+                // 🔹 Dates
+                HStack(alignment: .top, spacing: 12) {
+                    Circle()
+                        .fill(Color("calendarGreen"))
+                        .frame(width: 50, height: 50)
+                        .overlay(Image(systemName: "calendar").foregroundColor(.green))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Date Range:")
+                            .font(.headline)
+                        Text("\(request.details.first?.startDate.toDisplayDate() ?? "") - \(request.details.first?.endDate.toDisplayDate() ?? "")")
+                            .foregroundColor(.gray)
+                            .font(.subheadline)
+                        Text("\(request.details.first?.numberDays ?? "-") business days")
+                            .foregroundColor(Color("secondaryColor"))
+                            .font(.footnote)
+                    }
+                }
+
+                // 🔹 Suggestions
+                if detailViewModel.isLoading {
+                    ProgressView("Loading suggestion...")
+                } else if let suggestion = detailViewModel.suggestion {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(suggestion)
+                            .padding()
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(8)
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
+                }
+
+                // 🔹 Comments
+                HStack(alignment: .top, spacing: 12) {
+                    Circle()
+                        .fill(Color.purple.opacity(0.2))
+                        .frame(width: 50, height: 50)
+                        .overlay(Image(systemName: "bubble.left.and.bubble.right").foregroundColor(.purple))
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Your Comments:")
+                            .font(.headline)
+                        TextEditor(text: $comments)
+                            .frame(height: 80)
+                            .padding(8)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+                    }
+                }
+
+                // 🔹 Buttons
+                HStack(spacing: 12) {
+                    
+                    Button("Reject") {
+                        guard !comments.isEmpty else {
+                            alertMessage = "Please provide a comment before rejecting the request."
+                            showAlert = true
+                            return
+                        }
+                        detailViewModel.submitApproval(
+                            notificationId: request.id,
+                            comment: comments,
+                            isApproved: false
+                        ) { result in
+                            switch result {
+                            case .success(let msg):
+                                print("✅ \(msg)")
+                                onSuccess()
+                            case .failure(let error):
+                                print("❌ \(error.localizedDescription)")
+                                alertMessage = error.localizedDescription
+                                showAlert = true
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+
+                    Button("Approve") {
+                        guard !comments.isEmpty else {
+                            alertMessage = "Please provide a comment before approving the request."
+                            showAlert = true
+                            return
+                        }
+                        detailViewModel.submitApproval(
+                            notificationId: request.id,
+                            comment: comments,
+                            isApproved: true
+                        ) { result in
+                            switch result {
+                            case .success(let msg):
+                                print("✅ \(msg)")
+                                onSuccess()
+                            case .failure(let error):
+                                print("❌ \(error.localizedDescription)")
+                                alertMessage = error.localizedDescription
+                                showAlert = true
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
                 }
             }
+            .padding()
         }
+        .background(Color.white)
+        .cornerRadius(12)
         .padding()
         .onAppear {
-            if let referenceId = request.details.first?.referenceEntityId {
-                //detailViewModel.fetchConflicts(referenceEntityId: referenceId)
-                print("Fetch conflicts?")
+            if let id = request.details.first?.referenceEntityId {
+                detailViewModel.fetchSuggestion(vacationRequestId: id)
             }
         }
-        .navigationTitle("Request Details")
+        .alert("Error", isPresented: $showAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage)
+        }
+
+        
     }
 }
+

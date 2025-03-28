@@ -52,7 +52,7 @@ struct HomeView: View {
                         .padding(.vertical, 6)
                     }
                 }
-                .searchable(text: $searchText, prompt: "Search options...")
+                //.searchable(text: $searchText, prompt: "Search options...")
 
                 Spacer()
 

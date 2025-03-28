@@ -4,32 +4,6 @@
     "" : {
 
     },
-    "**Collaborator:** %@" : {
-
-    },
-    "**Date Range:** %@ - %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "**Date Range:** %1$@ - %2$@"
-          }
-        }
-      }
-    },
-    "**Seniority:** %@ (%lld years)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "**Seniority:** %1$@ (%2$lld years)"
-          }
-        }
-      }
-    },
-    "**Status:** %@" : {
-
-    },
     "%@ - %@" : {
       "localizations" : {
         "en" : {
@@ -50,10 +24,26 @@
         }
       }
     },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ business days" : {
+
+    },
     "%lld" : {
 
     },
     "%lld Business Days" : {
+
+    },
+    "%lld years" : {
 
     },
     "©Mind Group 2025" : {
@@ -73,15 +63,6 @@
 
     },
     "Account: " : {
-
-    },
-    "Add your comments..." : {
-
-    },
-    "Admin Vacations" : {
-
-    },
-    "AdminCalendarView" : {
 
     },
     "Approve" : {
@@ -120,7 +101,7 @@
     "Comments: %@" : {
 
     },
-    "Conflicts Detected:" : {
+    "Date Range:" : {
 
     },
     "Done" : {
@@ -146,6 +127,9 @@
     "End Date" : {
 
     },
+    "Error" : {
+
+    },
     "Error: %@" : {
 
     },
@@ -169,7 +153,7 @@
         }
       }
     },
-    "Loading conflicts..." : {
+    "Loading suggestion..." : {
 
     },
     "Loading..." : {
@@ -276,22 +260,25 @@
     "Reject" : {
 
     },
-    "Request Details" : {
+    "Request Vacation" : {
 
     },
-    "Request Vacation" : {
+    "Requested on %@" : {
 
     },
     "Requested on: %@" : {
 
     },
-    "Search options..." : {
+    "Review the request and check for any conflicts" : {
 
     },
     "Section" : {
 
     },
     "Select Month & Year" : {
+
+    },
+    "Show %lld more" : {
 
     },
     "Start Date" : {
@@ -343,6 +330,9 @@
         }
       }
     },
+    "Vacation Request Details" : {
+
+    },
     "Vacation requested submitted successfully!" : {
 
     },
@@ -390,7 +380,7 @@
         }
       }
     },
-    "Your Comments" : {
+    "Your Comments:" : {
 
     }
   },

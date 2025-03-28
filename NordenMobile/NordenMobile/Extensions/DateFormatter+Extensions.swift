@@ -19,6 +19,15 @@ extension String {
     func toMonthDayFormatted() -> String {
         return self.toDate()?.toMonthDayString() ?? self
     }
+    
+    //"2025-03-01" a "01/03/2025":
+    func toDisplayDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let date = formatter.date(from: self) else { return self }
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: date)
+    }
 }
 
 extension Date {

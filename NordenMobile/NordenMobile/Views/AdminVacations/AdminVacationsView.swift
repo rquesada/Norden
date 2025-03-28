@@ -15,15 +15,6 @@ struct AdminVacationsView: View {
         VStack {
             VStack {
                 HStack {
-                    Text("Admin Vacations")
-                        .font(.title)
-                        .bold()
-                        .foregroundColor(Color("primaryColor"))
-                    Spacer()
-                }
-                .padding(.horizontal)
-
-                HStack {
                     Picker("Account", selection: $viewModel.selectedAccountId) {
                         ForEach(viewModel.accounts, id: \.id) { account in
                             Text(account.name).tag(account.id)
@@ -35,6 +26,8 @@ struct AdminVacationsView: View {
                         viewModel.fetchCollaborators(for: newAccountId)
                         viewModel.fetchNotifications(for: newAccountId)
                         viewModel.fetchApprovals(for: newAccountId)
+                        viewModel.fetchExceptions(for: newAccountId)
+                        viewModel.fetchApprovedVacations(for: newAccountId, year: viewModel.currentYear)
                     }
 
                     Picker("Collaborator", selection: $viewModel.selectedCollaboratorId) {
@@ -68,9 +61,9 @@ struct AdminVacationsView: View {
             VStack {
                 switch selectedTab {
                 case .approvals:
-                    ApprovalsView(approvalRequests: viewModel.approvals, errorMessage: viewModel.errorMessage)
+                    ApprovalsView(viewModel: viewModel)
                 case .calendar:
-                    AdminCalendarView()
+                    AdminCalendarView(viewModel: viewModel)
                 case .notifications:
                     NotificationsView(notifications: viewModel.notifications, errorMessage: viewModel.errorMessage)
                 }

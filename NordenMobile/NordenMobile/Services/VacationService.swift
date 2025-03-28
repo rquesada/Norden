@@ -255,6 +255,41 @@ class VacationsService {
             }
         }.resume()
     }
+    
+    func fetchVacationExceptions(teamId: String, completion: @escaping (Result<[Exception], Error>) -> Void) {
+            guard let url = URL(string: "\(AppConfig.baseURL)/exception/exceptions/vacations?teamId=\(teamId)") else {
+                completion(.failure(NSError(domain: "Invalid URL", code: 400)))
+                return
+            }
+
+            guard let token = AuthTokenManager.shared.getAuthToken() else {
+                completion(.failure(NSError(domain: "Missing Auth Token", code: 401)))
+                return
+            }
+
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.timeoutInterval = AppConfig.requestTimeout
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+
+                guard let data = data else {
+                    completion(.failure(NSError(domain: "No data", code: 500)))
+                    return
+                }
+
+                do {
+                    let exceptions = try JSONDecoder().decode([Exception].self, from: data)
+                    completion(.success(exceptions))
+                } catch {
+                    completion(.failure(error))
+                }
+            }.resume()
+        }
 }
 
 
@@ -431,5 +466,83 @@ extension VacationsService {
             }
         }.resume()
     }
+    
+    func fetchAdminSuggestions(vacationRequestId: String, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let url = URL(string: "\(AppConfig.baseURL)/suggestions?vacationRequestId=\(vacationRequestId)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 400)))
+            return
+        }
+
+        guard let token = AuthTokenManager.shared.getAuthToken() else {
+            completion(.failure(NSError(domain: "Missing Auth Token", code: 401)))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = AppConfig.requestTimeout
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data", code: 500)))
+                return
+            }
+
+            do {
+                let result = try JSONDecoder().decode(SuggestionResponse.self, from: data)
+                completion(.success(result.reason))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
+    func updateApproval(notificationId: String, comment: String, isApproved: Bool, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let url = URL(string: "\(AppConfig.baseURL)/notification/approval"),
+              let token = AuthTokenManager.shared.getAuthToken() else {
+            completion(.failure(NSError(domain: "Invalid request data", code: 400)))
+            return
+        }
+
+        let body: [String: Any] = [
+            "notificationId": notificationId,
+            "comment": comment,
+            "isApproved": isApproved
+        ]
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else {
+            completion(.failure(NSError(domain: "Invalid JSON body", code: 500)))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data,
+                  let response = try? JSONDecoder().decode([String: String].self, from: data),
+                  let message = response["message"] else {
+                completion(.failure(NSError(domain: "Invalid response", code: 500)))
+                return
+            }
+
+            completion(.success(message))
+        }.resume()
+    }
+
+
 }
 
